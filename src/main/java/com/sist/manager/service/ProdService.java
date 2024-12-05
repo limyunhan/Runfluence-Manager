@@ -26,7 +26,7 @@ public class ProdService {
 	
 	// 제품 삽입
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-	public boolean prodInsert(Prod prod, List<String> prodFilterOptionValueIdList, List<VariantsOptionValueComb> variantsOptionValueCombList) {
+	public boolean prodInsert(Prod prod, List<String> prodFilterOptionValueIdList, List<VariantsOptionValueComb> variantsOptionValueCombList) throws Exception {
 		int cnt = 0;
 		
 		cnt = prodDao.prodInsert(prod);
@@ -37,9 +37,7 @@ public class ProdService {
 			hashMap.put("prodFilterOptionValueIdList", prodFilterOptionValueIdList);
 			prodDao.prodFilterOptionValueInsert(hashMap);
 			
-			hashMap.clear();
-			
-			hashMap.put("prodId", prod.getProdId()); // 상품 ID
+			hashMap.remove("prodFilterOptionValueIdList");
 	        hashMap.put("variantsOptionValueCombList", variantsOptionValueCombList);
 	        prodDao.variantsOptionValueCombInsert(hashMap);
 		}
@@ -70,5 +68,29 @@ public class ProdService {
 		}
 		
 		return list;
+	}
+	
+	public String getExpectedProdId(String prodSubCateCombinedId) {
+		String prodId = null;
+		
+		try {
+			prodId = prodDao.getExpectedProdId(prodSubCateCombinedId);
+		} catch (Exception e) {
+			logger.error("[ProdService] getExpectedProdId Exception", e);
+		}
+		
+		return prodId;
+	}
+	
+	public String getActualProdId(String prodSubCateCombinedId) {
+		String prodId = null;
+		
+		try {
+			prodId = prodDao.getActualProdId(prodSubCateCombinedId);
+		} catch (Exception e) {
+			logger.error("[ProdService] getActualProdId Exception", e);
+		}
+		
+		return prodId;
 	}
 }
