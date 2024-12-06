@@ -91,10 +91,10 @@ public class ProdController {
 		String prodStatus = HttpUtil.get(request, "prodStatus", "");
 		
 		List<String> prodFilterOptionValueIdList = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "filterOptions", "").split(",")));	
+		List<String> prodVariantsOptionIdList = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "varintsOptions", "").split(",")));
 		List<String> combinations = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "combinations", "").split(",")));
 		List<String> combinationsText = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "combinationsText", "").split(",")));
 		List<Integer> combinationsStock = Arrays.stream(HttpUtil.get(request, "combinationsStock", "").split(",")).map(stock -> StringUtil.isEmpty(stock) ? 0 : Integer.parseInt(stock)) .collect(Collectors.toList());    
-		
 		List<VariantsOptionValueComb> variantsOptionValueCombList = new ArrayList<>();
 		for (int i = 0; i < combinations.size(); i++) {
 			VariantsOptionValueComb variantsOptionValueComb = new VariantsOptionValueComb();
@@ -114,7 +114,7 @@ public class ProdController {
 		prod.setProdStatus(prodStatus);
 		
 		try {
-			if (prodService.prodInsert(prod, prodFilterOptionValueIdList, variantsOptionValueCombList)) {
+			if (prodService.prodInsert(prod, prodFilterOptionValueIdList, variantsOptionValueCombList, prodVariantsOptionIdList)) {
 				String actualProdId = prodService.getActualProdId(prodSubCateCombinedId);
 				String prodMainCateName = prodService.getProdMainCateName(prodSubCateCombinedId);
 				HttpUtil.getFiles(request, "prodImage", PROD_IMG_DIR + FileUtil.getFileSeparator() + prodMainCateName  + FileUtil.getFileSeparator() + "mainImg", actualProdId);
@@ -137,8 +137,8 @@ public class ProdController {
 	public JsonObject uploadImage(MultipartHttpServletRequest request) {
 		JsonObject jsonObject = new JsonObject();
 		String prodMainCateName = HttpUtil.get(request, "prodMainCateName", "");
-		String subCateCombindedId = HttpUtil.get(request, "subCateCombinedId", "");
-		String expectedProdId = prodService.getExpectedProdId(subCateCombindedId);
+		String prodSubCateCombindedId = HttpUtil.get(request, "prodSubCateCombinedId", "");
+		String expectedProdId = prodService.getExpectedProdId(prodSubCateCombindedId);
 		FileData fileData = HttpUtil.getFile(request, "file", PROD_IMG_DIR + FileUtil.getFileSeparator() + prodMainCateName + FileUtil.getFileSeparator() + "infoImg", expectedProdId);
 		
 		StringBuilder srcFile = new StringBuilder();

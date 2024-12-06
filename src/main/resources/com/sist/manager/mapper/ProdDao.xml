@@ -88,7 +88,7 @@
     </select>
     
     <select id="getExpectedProdId" parameterType="string" resultType="string">
-        SELECT #{value} || LPAD(TO_CHAR(MAX(TO_NUMBER(SUBSTR(PROD_ID, 5))) + 1), 8, '0') FROM PROD
+        SELECT  #{value} || LPAD(TO_CHAR(NVL(MAX(TO_NUMBER(SUBSTR(PROD_ID, 5))), 0) + 1), 8, '0') FROM PROD
     </select>
     
     <select id="getActualProdId" parameterType="string" resultType="string">
@@ -98,4 +98,16 @@
     <select id="getProdMainCateName" parameterType="string" resultType="string">
         SELECT PROD_MAIN_CATE_NAME FROM PROD_MAIN_CATE WHERE PROD_MAIN_CATE_ID = (SELECT PROD_MAIN_CATE_ID FROM PROD_SUB_CATE WHERE PROD_SUB_CATE_COMBINED_ID = #{value})
     </select>
+    
+	<insert id="prodVariantsOptionInsert" parameterType="java.util.HashMap">
+	    <selectKey keyProperty="prodId" resultType="string" order="BEFORE">
+	        SELECT #{prodSubCateCombinedId} || LPAD(PROD_SEQ.CURRVAL, 8, '0') FROM DUAL
+	    </selectKey>
+	    INSERT ALL
+	    <foreach collection="prodVariantsOptionIdList" item="variantsOptionId">
+	        INTO PROD_VARIANTS_OPTION (VARIANTS_OPTION_ID, PROD_ID)
+	        VALUES (#{variantsOptionId}, #{prodId})
+	    </foreach>
+	    SELECT 1 FROM DUAL
+	</insert>
 </mapper>

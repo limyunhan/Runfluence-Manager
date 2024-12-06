@@ -26,7 +26,7 @@ public class ProdService {
 	
 	// 제품 삽입
 	@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-	public boolean prodInsert(Prod prod, List<String> prodFilterOptionValueIdList, List<VariantsOptionValueComb> variantsOptionValueCombList) throws Exception {
+	public boolean prodInsert(Prod prod, List<String> prodFilterOptionValueIdList, List<VariantsOptionValueComb> variantsOptionValueCombList, List<String> prodVariantsOptionIdList) throws Exception {
 		int cnt = 0;
 		
 		cnt = prodDao.prodInsert(prod);
@@ -44,6 +44,12 @@ public class ProdService {
 				hashMap.remove("prodFilterOptionValueIdList");
 		        hashMap.put("variantsOptionValueCombList", variantsOptionValueCombList);
 		        prodDao.variantsOptionValueCombInsert(hashMap);
+			}
+			
+			if (prodVariantsOptionIdList.size() > 0) {
+				hashMap.remove("variantsOptionValueCombList");
+				hashMap.put("prodVariantsOptionList", prodVariantsOptionIdList);
+				prodDao.prodVariantsOptionInsert(hashMap);
 			}
 		}
 				

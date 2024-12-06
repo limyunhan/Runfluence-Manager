@@ -35,7 +35,8 @@ $(document).ready(function() {
                     uploadImage(files[i]);
                 }
             }
-        }
+        },
+        disableDragAndDrop: true  
     });
     
     $('#prodPrice').on('input', function() {
@@ -140,21 +141,27 @@ $(document).ready(function() {
         switch (selectedCombination) {
             case 'CLOTH_SIZE + THEME':
                 values = variantsOptionValueListMap['CLOTH_SIZE'].concat(variantsOptionValueListMap['THEME']);
+                $("#variantsOptions").val("CLOTH_SIZE,THEME");
                 break;
             case 'SHOE_SIZE + THEME':
                 values = variantsOptionValueListMap['SHOE_SIZE'].concat(variantsOptionValueListMap['THEME']);
+                $("#variantsOptions").val("SHOE_SIZE,THEME");
                 break;
             case 'CLOTH_SIZE':
                 values = variantsOptionValueListMap['CLOTH_SIZE'];
+                $("#variantsOptions").val("CLOTH_SIZE");
                 break;
             case 'SHOE_SIZE':
                 values = variantsOptionValueListMap['SHOE_SIZE'];
+                $("#variantsOptions").val("SHOE_SIZE");
                 break;
             case 'DEFAULT':
                 values = variantsOptionValueListMap['DEFAULT'];
+                $("#variantsOptions").val("DEFAULT");
                 break;
             case 'THEME':
                 values = variantsOptionValueListMap['THEME'];
+                $("#variantsOptions").val("THEME");
                 break;
         }
 
@@ -286,6 +293,7 @@ function uploadImage(file) {
             const imgTag = document.createElement("img");
             imgTag.src = imageUrl;
             imgTag.alt = altText;
+            imgTag.style.display = "inline"; 
             
             $("#prodInfo").summernote("insertNode", imgTag);
         },
@@ -427,6 +435,7 @@ function uploadImage(file) {
         <button id="reg-btn" class="btn btn-primary px-5 py-2 text-nowrap">제품 등록</button>
       </div>
       
+      <input type="hidden" id="variantsOptions" name="variantsOptions" value=""></input>
       <input type="hidden" id="filterOptions" name="filterOptions" value=""></input>
       <input type="hidden" id="combinations" name="combinations" value=""></input>
       <input type="hidden" id="combinationsStock" name="combinationsStock" value=""></input>

@@ -14,6 +14,7 @@ public interface ProdDao {
 	public abstract int prodInsert(Prod prod);
 	public abstract int prodFilterOptionValueInsert(HashMap<String, Object> hashMap);
 	public abstract int variantsOptionValueCombInsert(HashMap<String, Object> hashMap);
+	public abstract int prodVariantsOptionInsert(HashMap<String, Object> hashMap);
 	public abstract List<VariantsOption> variantsOptionList();
 	public abstract List<VariantsOptionValue> variantsOptionValueList();	
 	public abstract String getExpectedProdId(String prodSubCateCombinedId);
