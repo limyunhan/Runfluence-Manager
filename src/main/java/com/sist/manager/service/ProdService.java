@@ -34,12 +34,17 @@ public class ProdService {
 		if (cnt == 1) {
 			HashMap<String, Object> hashMap = new HashMap<>();
 			hashMap.put("prodSubCateCombinedId", prod.getProdSubCateCombinedId());
-			hashMap.put("prodFilterOptionValueIdList", prodFilterOptionValueIdList);
-			prodDao.prodFilterOptionValueInsert(hashMap);
 			
-			hashMap.remove("prodFilterOptionValueIdList");
-	        hashMap.put("variantsOptionValueCombList", variantsOptionValueCombList);
-	        prodDao.variantsOptionValueCombInsert(hashMap);
+			if (prodFilterOptionValueIdList.size() > 0) {
+				hashMap.put("prodFilterOptionValueIdList", prodFilterOptionValueIdList);
+				prodDao.prodFilterOptionValueInsert(hashMap);
+			}
+			
+			if (variantsOptionValueCombList.size() > 0) {
+				hashMap.remove("prodFilterOptionValueIdList");
+		        hashMap.put("variantsOptionValueCombList", variantsOptionValueCombList);
+		        prodDao.variantsOptionValueCombInsert(hashMap);
+			}
 		}
 				
 		return (cnt == 1);
@@ -92,5 +97,17 @@ public class ProdService {
 		}
 		
 		return prodId;
+	}
+	
+	public String getProdMainCateName(String prodSubCateCombinedId) {
+		String prodMainCateName = null;
+		
+		try {
+			prodMainCateName = prodDao.getProdMainCateName(prodSubCateCombinedId);
+		} catch (Exception e) {
+			logger.error("[ProdService] getProdMainCateName Exception", e);
+		}
+		
+		return prodMainCateName;
 	}
 }

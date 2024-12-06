@@ -42,37 +42,43 @@
 	    <selectKey keyProperty="prodId" resultType="String" order="BEFORE">
 	        SELECT #{prodSubCateCombinedId} || LPAD(PROD_SEQ.CURRVAL, 8, '0') FROM DUAL
 	    </selectKey>
-	    INSERT INTO PROD_FILTER_OPTION_VALUE (
-	        PROD_ID,
-	        FILTER_OPTION_VALUE_ID
-	    )
-	    VALUES
-	    <foreach collection="prodFilterOptionValueIdList" item="filterOptionValueId" separator=",">
-	        (#{prodId}, #{filterOptionValueId})
+	    INSERT ALL
+	    <foreach collection="prodFilterOptionValueIdList" item="filterOptionValueId">
+	        INTO PROD_FILTER_OPTION_VALUE (
+	            PROD_ID,
+	            FILTER_OPTION_VALUE_ID
+	        )
+	        VALUES (
+	            #{prodId},
+	            #{filterOptionValueId}
+	        )
 	    </foreach>
+	    SELECT 1 FROM DUAL
 	</insert>
-
 	
+
 	<insert id="variantsOptionValueCombInsert" parameterType="java.util.HashMap">
 	    <selectKey keyProperty="prodId" resultType="String" order="BEFORE">
 	        SELECT #{prodSubCateCombinedId} || LPAD(PROD_SEQ.CURRVAL, 8, '0') FROM DUAL
 	    </selectKey>
-	    INSERT INTO VARIANTS_OPTION_VALUE_COMB (
-	        VARIANTS_OPTION_VALUE_COMB_ID,
-	        PROD_ID,
-	        VARIANTS_OPTION_VALUE_COMB_STOCK,
-	        VARIANTS_OPTION_VALUE_COMB_TEXT
-	    )
-	    VALUES
-	    <foreach collection="variantsOptionValueCombList" item="variantsOptionValueComb" separator=",">
-	        (#{variantsOptionValueComb.variantsOptionValueCombId},
-	         #{prodId},
-	         #{variantsOptionValueComb.variantsOptionValueCombStock},
-	         #{variantsOptionValueComb.variantsOptionValueCombText})
+	    INSERT ALL
+	    <foreach collection="variantsOptionValueCombList" item="variantsOptionValueComb">
+	        INTO VARIANTS_OPTION_VALUE_COMB (
+	            VARIANTS_OPTION_VALUE_COMB_ID,
+	            PROD_ID,
+	            VARIANTS_OPTION_VALUE_COMB_STOCK,
+	            VARIANTS_OPTION_VALUE_COMB_TEXT
+	        )
+	        VALUES (
+	            #{variantsOptionValueComb.variantsOptionValueCombId},
+	            #{prodId},
+	            #{variantsOptionValueComb.variantsOptionValueCombStock},
+	            #{variantsOptionValueComb.variantsOptionValueCombText}
+	        )
 	    </foreach>
+	    SELECT 1 FROM DUAL
 	</insert>
 
-	
 	<select id="variantsOptionList" resultMap="variantsOptionResultMap"> 
 	   SELECT * FROM VARIANTS_OPTION
 	</select>
@@ -82,10 +88,14 @@
     </select>
     
     <select id="getExpectedProdId" parameterType="string" resultType="string">
-        SELECT #{prodSubCateCombinedId} || LPAD(TO_CHAR(MAX(TO_NUMBER(SUBSTR(PROD_ID, 5))) + 1), 8, '0') FROM PROD;
+        SELECT #{value} || LPAD(TO_CHAR(MAX(TO_NUMBER(SUBSTR(PROD_ID, 5))) + 1), 8, '0') FROM PROD
     </select>
     
     <select id="getActualProdId" parameterType="string" resultType="string">
-        SELECT #{prodSubCateCombinedId} || LPAD(PROD_SEQ.CURRVAL, 8, '0') FROM DUAL
+        SELECT #{value} || LPAD(PROD_SEQ.CURRVAL, 8, '0') FROM DUAL
+    </select>
+    
+    <select id="getProdMainCateName" parameterType="string" resultType="string">
+        SELECT PROD_MAIN_CATE_NAME FROM PROD_MAIN_CATE WHERE PROD_MAIN_CATE_ID = (SELECT PROD_MAIN_CATE_ID FROM PROD_SUB_CATE WHERE PROD_SUB_CATE_COMBINED_ID = #{value})
     </select>
 </mapper>

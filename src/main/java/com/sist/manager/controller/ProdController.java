@@ -116,7 +116,8 @@ public class ProdController {
 		try {
 			if (prodService.prodInsert(prod, prodFilterOptionValueIdList, variantsOptionValueCombList)) {
 				String actualProdId = prodService.getActualProdId(prodSubCateCombinedId);
-				HttpUtil.getFiles(request, "prodImage", PROD_IMG_DIR + FileUtil.getFileSeparator() + "prodMainCateName" + FileUtil.getFileSeparator() + "mainImg", actualProdId);
+				String prodMainCateName = prodService.getProdMainCateName(prodSubCateCombinedId);
+				HttpUtil.getFiles(request, "prodImage", PROD_IMG_DIR + FileUtil.getFileSeparator() + prodMainCateName  + FileUtil.getFileSeparator() + "mainImg", actualProdId);
 				ajaxResponse.setResponse(200, "제품 등록 완료");
 				
 			} else {
@@ -131,15 +132,17 @@ public class ProdController {
 		return ajaxResponse;
 	}
 	
-	
-	@RequestMapping(value = "/bbs/uploadImage", method = RequestMethod.POST)
+	@RequestMapping(value = "/prod/uploadImage", method = RequestMethod.POST)
 	@ResponseBody
 	public JsonObject uploadImage(MultipartHttpServletRequest request) {
 		JsonObject jsonObject = new JsonObject();
 		String prodMainCateName = HttpUtil.get(request, "prodMainCateName", "");
-		FileData fileData = HttpUtil.getFile(request, "file", PROD_IMG_DIR + FileUtil.getFileSeparator() + prodMainCateName + FileUtil.getFileSeparator() + "infoImg");		
+		String subCateCombindedId = HttpUtil.get(request, "subCateCombinedId", "");
+		String expectedProdId = prodService.getExpectedProdId(subCateCombindedId);
+		FileData fileData = HttpUtil.getFile(request, "file", PROD_IMG_DIR + FileUtil.getFileSeparator() + prodMainCateName + FileUtil.getFileSeparator() + "infoImg", expectedProdId);
 		
 		StringBuilder srcFile = new StringBuilder();
+		
 		srcFile.append("/resources/prod-img")
 			.append(FileUtil.getFileSeparator())
 			.append(prodMainCateName)
@@ -147,11 +150,9 @@ public class ProdController {
 			.append("infoImg")
 			.append(FileUtil.getFileSeparator())
 			.append(fileData.getFileName());
-		
 		jsonObject.addProperty("url", srcFile.toString());
 		jsonObject.addProperty("orgName", fileData.getFileOrgName());
 	
 		return jsonObject;
 	}
-
 }

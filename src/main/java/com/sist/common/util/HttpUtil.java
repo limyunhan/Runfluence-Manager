@@ -1042,83 +1042,84 @@ public final class HttpUtil {
 	 * @param newFileName   새로운 파일명
 	 * @return FileData
 	 */
-	public static FileData getFile(MultipartHttpServletRequest request, String name, String saveDirectory,
-			String newFileName) {
-		FileData data = null;
+	public static FileData getFile(MultipartHttpServletRequest request, String name, String saveDirectory, String newFileName) {
+	    FileData data = null;
 
-		logger.debug("name          : " + name);
-		logger.debug("saveDirectory : " + saveDirectory);
-		logger.debug("newFileName   : " + newFileName);
+	    logger.debug("name          : " + name);
+	    logger.debug("saveDirectory : " + saveDirectory);
+	    logger.debug("newFileName   : " + newFileName);
 
-		if (!StringUtil.isEmpty(name) && !StringUtil.isEmpty(saveDirectory)) {
-			MultipartFile file = request.getFile(name);
+	    if (!StringUtil.isEmpty(name) && !StringUtil.isEmpty(saveDirectory)) {
+	        MultipartFile file = request.getFile(name);
 
-			if (file != null && file.getSize() > 0) {
-				try {
-					if (FileUtil.createDirectory(saveDirectory)) {
-						data = new FileData();
+	        if (file != null && file.getSize() > 0) {
+	            try {
+	                if (FileUtil.createDirectory(saveDirectory)) {
+	                    data = new FileData();
 
-						data.setName(name);
-						data.setFileOrgName(file.getOriginalFilename());
+	                    data.setName(name);
+	                    data.setFileOrgName(file.getOriginalFilename());
 
-						logger.debug("org file name : " + data.getFileOrgName());
+	                    logger.debug("org file name : " + data.getFileOrgName());
 
-						String strFileExt = FileUtil.getFileExtension(data.getFileOrgName());
+	                    String strFileExt = FileUtil.getFileExtension(data.getFileOrgName());
+	                    String baseName;
 
-						if (!StringUtil.isEmpty(newFileName)) {
-							if (!StringUtil.isEmpty(strFileExt)) {
-								newFileName += "." + strFileExt;
-								data.setFileExt(strFileExt);
-							}
-						} else {
-							newFileName = FileUtil.uniqueFileName(strFileExt);
+	                    // 기존 파일 이름 처리
+	                    if (!StringUtil.isEmpty(newFileName)) {
+	                        baseName = newFileName;
+	                    } else {
+	                        baseName = FileUtil.uniqueFileName(strFileExt);
+	                    }
 
-							if (!StringUtil.isEmpty(strFileExt)) {
-								data.setFileExt(strFileExt);
-							}
-						}
+	                    // 확장자가 있을 경우 추가
+	                    if (!StringUtil.isEmpty(strFileExt)) {
+	                        data.setFileExt(strFileExt);
+	                    }
 
-						data.setFileName(newFileName);
-						data.setFileSize(file.getSize());
+	                    // 파일 이름 중복 처리 (_1, _2 형식으로 추가)
+	                    String uniqueFileName = baseName + (StringUtil.isEmpty(strFileExt) ? "" : "." + strFileExt);
+	                    int counter = 1;
 
-						String strFileFullPath = saveDirectory + FileUtil.getFileSeparator() + data.getFileName();
+	                    while (FileUtil.isFile(saveDirectory + FileUtil.getFileSeparator() + uniqueFileName)) {
+	                        uniqueFileName = baseName + "_" + counter + (StringUtil.isEmpty(strFileExt) ? "" : "." + strFileExt);
+	                        counter++;
+	                    }
 
-						if (FileUtil.isFile(strFileFullPath)) {
-							logger.debug("delete file : " + strFileFullPath);
+	                    data.setFileName(uniqueFileName);
+	                    data.setFileSize(file.getSize());
 
-							FileUtil.deleteFile(strFileFullPath);
-						}
+	                    String strFileFullPath = saveDirectory + FileUtil.getFileSeparator() + data.getFileName();
 
-						logger.debug("new file name : " + data.getFileName());
-						logger.debug("file ext      : " + data.getFileExt());
-						logger.debug("file size     : " + data.getFileSize());
+	                    logger.debug("new file name : " + data.getFileName());
+	                    logger.debug("file ext      : " + data.getFileExt());
+	                    logger.debug("file size     : " + data.getFileSize());
 
-						file.transferTo(new File(new File(saveDirectory), data.getFileName()));
+	                    // 파일 저장
+	                    file.transferTo(new File(new File(saveDirectory), data.getFileName()));
 
-						data.setFilePath(saveDirectory + FileUtil.getFileSeparator() + data.getFileName());
-					} else {
-						logger.error("name          : " + name);
-						logger.error("saveDirectory : " + saveDirectory);
-						logger.error("failed to create directory.");
-					}
-				} catch (IllegalStateException e) {
-					data = null;
-					logger.error("IllegalStateException : " + e.getMessage());
+	                    data.setFilePath(strFileFullPath);
+	                } else {
+	                    logger.error("name          : " + name);
+	                    logger.error("saveDirectory : " + saveDirectory);
+	                    logger.error("failed to create directory.");
+	                }
+	            } catch (IllegalStateException e) {
+	                data = null;
+	                logger.error("IllegalStateException : " + e.getMessage());
+	                e.printStackTrace();
+	            } catch (IOException e) {
+	                data = null;
+	                logger.error("IOException : " + e.getMessage());
+	                e.printStackTrace();
+	            }
+	        }
+	    } else {
+	        logger.error("name          : " + name);
+	        logger.error("saveDirectory : " + saveDirectory);
+	    }
 
-					e.printStackTrace();
-				} catch (IOException e) {
-					data = null;
-					logger.error("IOException : " + e.getMessage());
-
-					e.printStackTrace();
-				}
-			}
-		} else {
-			logger.error("name          : " + name);
-			logger.error("saveDirectory : " + saveDirectory);
-		}
-
-		return data;
+	    return data;
 	}
 
 	public static List<FileData> getFiles(MultipartHttpServletRequest request, String tagName, String saveDirectory, String customFileName) {

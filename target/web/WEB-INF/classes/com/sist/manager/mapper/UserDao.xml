@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sist.manager.dao.UserDao">
+    <resultMap type="com.sist.manager.model.User" id="userResultMap">
+        <id column="USER_ID" property="userId" />
+        <result column="USER_PWD" property="userPwd" />
+        <result column="USER_NAME" property="userName" />
+        <result column="USER_EMAIL" property="userEmail" />
+        <result column="STATUS" property="status" />
+        <result column="REG_DATE" property="regDate" />
+    </resultMap>
+
+    <select id="userList" parameterType="com.sist.manager.model.User" resultMap="userResultMap">
+	    SELECT USER_ID, USER_PWD, USER_NAME, USER_EMAIL, STATUS, REG_DATE
+		FROM (
+		    SELECT ROWNUM RNUM, USER_ID, USER_PWD, USER_NAME, USER_EMAIL, STATUS, REG_DATE
+		    FROM (
+		        SELECT USER_ID,
+		            NVL(USER_PWD, '') USER_PWD,
+		            NVL(USER_NAME, '') USER_NAME,
+		            NVL(USER_EMAIL, '') USER_EMAIL,
+		            NVL(STATUS, 'N') STATUS,
+		            NVL(TO_CHAR(REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') REG_DATE
+		        FROM TBL_USER
+		        WHERE 1 = 1  
+		            <if test='userId != null and userId != ""'> AND USER_ID LIKE '%'|| #{userId} || '%' </if>
+		            <if test='userName != null and userName != ""'> AND USER_NAME LIKE '%' || #{userName} || '%' </if>
+		            <if test='status != null and status != ""'> AND STATUS LIKE '%' || #{status} || '%' </if>
+		            ORDER BY REG_DATE DESC
+		    )
+		)
+		WHERE RNUM BETWEEN #{startRow} AND #{endRow}
+    </select>
+    
+    <select id="userListCount" parameterType="com.sist.manager.model.User" resultType="int">
+        SELECT COUNT(USER_ID)
+		FROM TBL_USER
+		WHERE 1 = 1 
+			<if test='userId != null and userId != ""'> AND USER_ID LIKE '%'|| #{userId} || '%' </if>
+	        <if test='userName != null and userName != ""'> AND USER_NAME LIKE '%' || #{userName} || '%' </if>
+	        <if test='status != null and status != ""'> AND STATUS LIKE '%' || #{status} || '%' </if>
+    </select>
+    
+    <select id="userSelect" parameterType="string" resultMap="userResultMap">
+	    SELECT
+		    USER_ID,
+		    NVL(USER_PWD, '') USER_PWD,
+		    NVL(USER_NAME, '') USER_NAME,
+		    NVL(USER_EMAIL, '') USER_EMAIL,
+		    NVL(STATUS, 'N') STATUS,
+		    NVL(TO_CHAR(REG_DATE, 'YYYY-MM-DD HH24:MI:SS'), '') REG_DATE
+		FROM TBL_USER
+		WHERE USER_ID = #{value}
+    </select>
+    
+    <update id="userUpdate" parameterType="com.sist.manager.model.User">
+	    UPDATE TBL_USER        
+		SET USER_PWD = #{userPwd},
+		    USER_NAME = #{userName},
+		    USER_EMAIL = #{userEmail},
+		    STATUS = #{status}
+		WHERE USER_ID = #{userId}
+    </update>
+</mapper>

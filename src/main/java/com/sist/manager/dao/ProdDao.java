@@ -18,4 +18,5 @@ public interface ProdDao {
 	public abstract List<VariantsOptionValue> variantsOptionValueList();	
 	public abstract String getExpectedProdId(String prodSubCateCombinedId);
 	public abstract String getActualProdId(String prodSubCateCombinedId);
+	public abstract String getProdMainCateName(String prodSubCateCombinedId);
 }

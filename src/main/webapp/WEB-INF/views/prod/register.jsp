@@ -75,7 +75,7 @@ $(document).ready(function() {
     	e.preventDefault();
     	
         let selectedFilterOptions = [];
-    	$('input[name="filterOptions"]:checked').each(function() {
+    	$('input[name="_filterOptions"]:checked').each(function() {
     		 selectedFilterOptions.push($(this).val()); 
     	});
 
@@ -246,28 +246,25 @@ function generateCombinations(arrays) {
 
 function uploadImage(file) {
     const formData = new FormData();
+    const prodSubCateCombinedId = $("#prodSubCateCombinedId").val();
     formData.append("file", file);
+    formData.append("prodSubCateCombinedId", prodSubCateCombinedId);
     
     var prodMainCateMap = {};
     <c:forEach var="entry" items="${prodMainCateMap}">
         prodMainCateMap["${entry.key}"] = {
-            "prodMainCateId": "${entry.value.prodMainCateId}", 
             "prodMainCateName": "${entry.value.prodMainCateName}"
         };
     </c:forEach>
-    console.log(prodMainCateMap);
-
+    
     var prodSubCateMap = {};
     <c:forEach var="entry" items="${prodSubCateMap}">
         prodSubCateMap["${entry.key}"] = {
-            "prodSubCateId": "${entry.value.prodSubCateId}", 
-            "prodSubCateName": "${entry.value.prodSubCateName}"
+            "prodMainCateId": "${entry.value.prodMainCateId}"
         };
     </c:forEach>
-    console.log(prodSubCateMap);
     
-    const prodSubCateCombinedId = $("#prodSubCateCombinedId").val();
-    const prodMainCateId = prodSubCateMap[prodSubCateCombinedId]?.prodMainCateId; 
+    const prodMainCateId = prodSubCateMap[prodSubCateCombinedId]?.prodMainCateId;
     const prodMainCateName = prodMainCateMap[prodMainCateId]?.prodMainCateName || "Unknown Category";
     formData.append("prodMainCateName", prodMainCateName);
      
@@ -381,7 +378,7 @@ function uploadImage(file) {
               <legend class="w-auto px-2 text-primary fs-6">${filterOption.filterOptionName}</legend>
               <c:forEach var="filterOptionValue" items="${filterOptionValueListMap[filterOption.filterOptionId]}" varStatus="status">
                 <div class="form-check">
-                  <input type="checkbox" class="form-check-input" id="_${filterOptionValue.filterOptionValueId}" name="filterOptions" value="${filterOptionValue.filterOptionValueId}">
+                  <input type="checkbox" class="form-check-input" id="_${filterOptionValue.filterOptionValueId}" name="_filterOptions" value="${filterOptionValue.filterOptionValueId}">
                   <label class="form-check-label" for="_${filterOptionValue.filterOptionValueId}">${filterOptionValue.filterOptionValueName}</label>
                 </div>
               </c:forEach>

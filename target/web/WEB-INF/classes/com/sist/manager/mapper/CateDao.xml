@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sist.manager.dao.CateDao">
+    <resultMap type="com.sist.manager.model.ProdMainCate" id="prodMainCateResultMap">
+        <id column="PROD_MAIN_CATE_ID" property="prodMainCateId" />
+        <result column="PROD_MAIN_CATE_NAME" property="prodMainCateName" />
+    </resultMap>
+    
+    <resultMap type="com.sist.manager.model.ProdSubCate" id="prodSubCateResultMap">
+        <id column="PROD_SUB_CATE_COMBINED_ID" property="prodSubCateCombinedId" />
+        <result column="PROD_SUB_CATE_ID" property="prodSubCateId" />
+        <result column="PROD_SUB_CATE_NAME" property="prodSubCateName" />
+        <result column="PROD_MAIN_CATE_ID" property="prodMainCateId" />
+    </resultMap>
+    
+    <resultMap type="com.sist.manager.model.FilterOption" id="filterOptionResultMap">
+        <id column="FILTER_OPTION_ID" property="filterOptionId" />
+        <result column="FILTER_OPTION_NAME" property="filterOptionName" />
+    </resultMap>
+    
+    <resultMap type="com.sist.manager.model.FilterOptionValue" id="filterOptionValueResultMap">
+        <id column="FILTER_OPTION_VALUE_ID" property="filterOptionValueId" />
+        <result column="FILTER_OPTION_ID" property="filterOptionId" />
+        <result column="FILTER_OPTION_VALUE_NAME" property="filterOptionValueName" />
+    </resultMap>
+    
+    <!-- 메인 제품 카테고리 리스트 -->
+    <select id="prodMainCateList" resultMap="prodMainCateResultMap">
+        SELECT * FROM PROD_MAIN_CATE
+    </select>
+    
+    <!--  서브 제품 카테고리 리스트 -->
+    <select id="prodSubCateList" resultMap="prodSubCateResultMap">
+        SELECT * FROM PROD_SUB_CATE
+    </select>
+    
+    <!--  필터 옵션 리스트 -->
+    <select id="filterOptionList" resultMap="filterOptionResultMap">
+        SELECT * FROM FILTER_OPTION
+    </select>
+        
+    <!-- 필터 옵션 값 리스트 -->
+    <select id="filterOptionValueList" resultMap="filterOptionValueResultMap">
+        SELECT * FROM FILTER_OPTION_VALUE
+    </select>
+</mapper>

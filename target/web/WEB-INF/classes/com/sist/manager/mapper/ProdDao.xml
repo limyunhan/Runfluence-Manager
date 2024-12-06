@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sist.manager.dao.ProdDao">
+    <resultMap type="com.sist.manager.model.VariantsOption" id="variantsOptionResultMap">
+        <id column="VARIANTS_OPTION_ID" property="variantsOptionId" />
+        <result column="VARIANTS_OPTION_NAME" property="variantsOptionName" />
+    </resultMap>
+    
+    <resultMap type="com.sist.manager.model.VariantsOptionValue" id="variantsOptionValueResultMap">
+        <id column="VARIANTS_OPTION_VALUE_ID" property="variantsOptionValueId" />
+        <result column="VARIANTS_OPTION_ID" property="variantsOptionId" />
+        <result column="VARIANTS_OPTION_VALUE_NAME" property="variantsOptionValueName" />
+    </resultMap>
+    
+    <insert id="prodInsert" parameterType="com.sist.manager.model.Prod">
+	    <selectKey keyProperty="prodId" resultType="String" order="BEFORE">
+	        SELECT #{prodSubCateCombinedId} || LPAD(PROD_SEQ.NEXTVAL, 8, '0') FROM DUAL
+	    </selectKey>
+	    
+	    INSERT INTO PROD (
+	        PROD_ID,
+	        PROD_SUB_CATE_COMBINED_ID,
+	        PROD_NAME,
+	        PROD_PRICE,
+	        PROD_DISCOUNT_PERCENT,
+	        PROD_INFO,
+	        PROD_STATUS,
+	        REG_DATE
+	    ) VALUES (
+	        #{prodId},
+	        #{prodSubCateCombinedId},
+	        #{prodName},
+	        #{prodPrice},
+	        #{prodDiscountPercent},
+	        #{prodInfo},
+	        #{prodStatus},
+	        SYSDATE
+	    )
+    </insert>
+
+	<insert id="prodFilterOptionValueInsert" parameterType="java.util.HashMap">
+	    <selectKey keyProperty="prodId" resultType="String" order="BEFORE">
+	        SELECT #{prodSubCateCombinedId} || LPAD(PROD_SEQ.CURRVAL, 8, '0') FROM DUAL
+	    </selectKey>
+	    INSERT INTO PROD_FILTER_OPTION_VALUE (
+	        PROD_ID,
+	        FILTER_OPTION_VALUE_ID
+	    )
+	    VALUES
+	    <foreach collection="prodFilterOptionValueIdList" item="filterOptionValueId" separator=",">
+	        (#{prodId}, #{filterOptionValueId})
+	    </foreach>
+	</insert>
+
+	
+	<insert id="variantsOptionValueCombInsert" parameterType="java.util.HashMap">
+	    <selectKey keyProperty="prodId" resultType="String" order="BEFORE">
+	        SELECT #{prodSubCateCombinedId} || LPAD(PROD_SEQ.CURRVAL, 8, '0') FROM DUAL
+	    </selectKey>
+	    INSERT INTO VARIANTS_OPTION_VALUE_COMB (
+	        VARIANTS_OPTION_VALUE_COMB_ID,
+	        PROD_ID,
+	        VARIANTS_OPTION_VALUE_COMB_STOCK,
+	        VARIANTS_OPTION_VALUE_COMB_TEXT
+	    )
+	    VALUES
+	    <foreach collection="variantsOptionValueCombList" item="variantsOptionValueComb" separator=",">
+	        (#{variantsOptionValueComb.variantsOptionValueCombId},
+	         #{prodId},
+	         #{variantsOptionValueComb.variantsOptionValueCombStock},
+	         #{variantsOptionValueComb.variantsOptionValueCombText})
+	    </foreach>
+	</insert>
+
+	
+	<select id="variantsOptionList" resultMap="variantsOptionResultMap"> 
+	   SELECT * FROM VARIANTS_OPTION
+	</select>
+	
+	<select id="variantsOptionValueList" resultMap="variantsOptionValueResultMap">
+        SELECT * FROM VARIANTS_OPTION_VALUE
+    </select>
+    
+    <select id="getExpectedProdId" parameterType="string" resultType="string">
+        SELECT #{prodSubCateCombinedId} || LPAD(TO_CHAR(MAX(TO_NUMBER(SUBSTR(PROD_ID, 5))) + 1), 8, '0') FROM PROD;
+    </select>
+    
+    <select id="getActualProdId" parameterType="string" resultType="string">
+        SELECT #{prodSubCateCombinedId} || LPAD(PROD_SEQ.CURRVAL, 8, '0') FROM DUAL
+    </select>
+</mapper>
