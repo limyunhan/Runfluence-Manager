@@ -89,12 +89,13 @@ public class ProdController {
 		double prodDiscountPercent = HttpUtil.get(request, "prodDiscountPercent", 0.0);
 		String prodInfo = HttpUtil.get(request, "prodInfo", "");
 		String prodStatus = HttpUtil.get(request, "prodStatus", "");
+	
+		List<String> prodFilterOptionValueIdList = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "filterOptions", "").split(",", -1)));	
+		List<String> prodVariantsOptionIdList = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "variantsOptions", "").split(",", -1)));
+		List<String> combinations = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "combinations", "").split(",", -1)));
+		List<String> combinationsText = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "combinationsText", "").split(",", -1)));
+		List<Integer> combinationsStock = Arrays.stream(HttpUtil.get(request, "combinationsStock", "").split(",", -1)).map(stock -> StringUtil.isEmpty(stock) ? 0 : Integer.parseInt(stock)) .collect(Collectors.toList());    
 		
-		List<String> prodFilterOptionValueIdList = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "filterOptions", "").split(",")));	
-		List<String> prodVariantsOptionIdList = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "varintsOptions", "").split(",")));
-		List<String> combinations = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "combinations", "").split(",")));
-		List<String> combinationsText = new ArrayList<>(Arrays.asList(HttpUtil.get(request, "combinationsText", "").split(",")));
-		List<Integer> combinationsStock = Arrays.stream(HttpUtil.get(request, "combinationsStock", "").split(",")).map(stock -> StringUtil.isEmpty(stock) ? 0 : Integer.parseInt(stock)) .collect(Collectors.toList());    
 		List<VariantsOptionValueComb> variantsOptionValueCombList = new ArrayList<>();
 		for (int i = 0; i < combinations.size(); i++) {
 			VariantsOptionValueComb variantsOptionValueComb = new VariantsOptionValueComb();

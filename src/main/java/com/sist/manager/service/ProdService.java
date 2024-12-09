@@ -48,7 +48,7 @@ public class ProdService {
 			
 			if (prodVariantsOptionIdList.size() > 0) {
 				hashMap.remove("variantsOptionValueCombList");
-				hashMap.put("prodVariantsOptionList", prodVariantsOptionIdList);
+				hashMap.put("prodVariantsOptionIdList", prodVariantsOptionIdList);
 				prodDao.prodVariantsOptionInsert(hashMap);
 			}
 		}
